@@ -20,12 +20,29 @@ export function PersonalInfo() {
     summary: "",
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof PersonalInfo, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof PersonalInfo, string>>
+  >({});
 
   const handleChange = (field: keyof PersonalInfo, value: string) => {
+    // Bloqueia valores inválidos durante a digitação
+    switch (field) {
+      case "phone":
+        if (!/^[0-9]*$/.test(value)) return;
+        break;
+      case "linkedin":
+        if (value && !value.startsWith("https://linkedin.com/")) {
+          // deixa digitar, mas validará
+        }
+        break;
+      default:
+        break;
+    }
+
     const newInfo = { ...info, [field]: value };
     setInfo(newInfo);
 
+    // Validação em tempo real
     let error = "";
     switch (field) {
       case "name":
@@ -48,7 +65,14 @@ export function PersonalInfo() {
   };
 
   const handleExport = () => {
-    const blob = new Blob([JSON.stringify(info, null, 2)], { type: "application/json" });
+    if (Object.values(errors).some((e) => e)) {
+      alert("Corrija os erros antes de exportar!");
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify(info, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -63,7 +87,15 @@ export function PersonalInfo() {
     reader.onload = (e) => {
       try {
         const imported = JSON.parse(e.target?.result as string);
-        setInfo(imported);
+        // Filtra apenas campos válidos
+        const filtered: PersonalInfo = {
+          name: imported.name || "",
+          email: imported.email || "",
+          phone: imported.phone || "",
+          linkedin: imported.linkedin || "",
+          summary: imported.summary || "",
+        };
+        setInfo(filtered);
       } catch {
         alert("Arquivo JSON inválido!");
       }
@@ -72,17 +104,16 @@ export function PersonalInfo() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-      
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       {/* Título da página */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">
         Cadastro Pessoal
       </h1>
 
-      {/* Card do formulário */}
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
-        {/* Campos Nome, Email, Telefone, LinkedIn */}
-        {["nome", "e-mail", "telefone", "linkedIn"].map((field) => (
+      {/* Card */}
+      <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 space-y-6">
+        {/* Inputs Nome, Email, Telefone, LinkedIn */}
+        {["name", "email", "phone", "linkedin"].map((field) => (
           <div key={field} className="space-y-1">
             <input
               type="text"
@@ -91,7 +122,7 @@ export function PersonalInfo() {
               onChange={(e) =>
                 handleChange(field as keyof PersonalInfo, e.target.value)
               }
-              className={`w-full rounded-md bg-gray-50 border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full rounded-md border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 errors[field as keyof PersonalInfo] ? "border-red-500" : ""
               }`}
             />
@@ -108,15 +139,13 @@ export function PersonalInfo() {
             value={info.summary}
             onChange={(e) => handleChange("summary", e.target.value)}
             rows={4}
-            className={`w-full rounded-md bg-gray-50 border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full rounded-md border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errors.summary ? "border-red-500" : ""
             }`}
           />
           <div className="flex justify-between text-xs text-gray-500">
             {errors.summary && <p className="text-red-500">{errors.summary}</p>}
-            <span>
-              {info.summary.length}/{MAX_SUMMARY_LENGTH}
-            </span>
+            <span>{info.summary.length}/{MAX_SUMMARY_LENGTH}</span>
           </div>
         </div>
 
@@ -125,7 +154,7 @@ export function PersonalInfo() {
           <button
             type="button"
             onClick={handleExport}
-            className="flex-1 rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300 transition cursor-pointer"
+            className="flex-1 rounded-md bg-gray-800 px-4 py-2 text-white hover:bg-gray-700 transition"
           >
             Exportar JSON
           </button>

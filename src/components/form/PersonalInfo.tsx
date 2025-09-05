@@ -20,22 +20,19 @@ export function PersonalInfo() {
     summary: "",
   });
 
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof PersonalInfo, string>>
-  >({});
+  const [errors, setErrors] = useState<Partial<Record<keyof PersonalInfo, string>>>({});
 
   const handleChange = (field: keyof PersonalInfo, value: string) => {
     const newInfo = { ...info, [field]: value };
     setInfo(newInfo);
 
-    // Validação em tempo real
     let error = "";
     switch (field) {
       case "name":
         error = validateName(value);
         break;
       case "email":
-       error = validateEmail(value);
+        error = validateEmail(value);
         break;
       case "phone":
         error = validatePhone(value);
@@ -51,9 +48,7 @@ export function PersonalInfo() {
   };
 
   const handleExport = () => {
-    const blob = new Blob([JSON.stringify(info, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob([JSON.stringify(info, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -77,67 +72,73 @@ export function PersonalInfo() {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Dados Pessoais</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+      
+      {/* Título da página */}
+      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+        Cadastro Pessoal
+      </h1>
 
-      {["name", "email", "phone", "linkedin"].map((field) => (
-        <div key={field}>
-          <input
-            type="text"
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={info[field as keyof PersonalInfo]}
-            onChange={(e) =>
-              handleChange(field as keyof PersonalInfo, e.target.value)
-            }
-            className={`w-full rounded-md border p-2 ${
-              errors[field as keyof PersonalInfo]
-                ? "border-red-500"
-                : "border-gray-300"
+      {/* Card do formulário */}
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
+        {/* Campos Nome, Email, Telefone, LinkedIn */}
+        {["nome", "e-mail", "telefone", "linkedIn"].map((field) => (
+          <div key={field} className="space-y-1">
+            <input
+              type="text"
+              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              value={info[field as keyof PersonalInfo]}
+              onChange={(e) =>
+                handleChange(field as keyof PersonalInfo, e.target.value)
+              }
+              className={`w-full rounded-md bg-gray-50 border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors[field as keyof PersonalInfo] ? "border-red-500" : ""
+              }`}
+            />
+            {errors[field as keyof PersonalInfo] && (
+              <p className="text-sm text-red-500">{errors[field as keyof PersonalInfo]}</p>
+            )}
+          </div>
+        ))}
+
+        {/* Resumo Profissional */}
+        <div className="space-y-1">
+          <textarea
+            placeholder="Resumo Profissional"
+            value={info.summary}
+            onChange={(e) => handleChange("summary", e.target.value)}
+            rows={4}
+            className={`w-full rounded-md bg-gray-50 border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.summary ? "border-red-500" : ""
             }`}
           />
-          {errors[field as keyof PersonalInfo] && (
-            <p className="text-sm text-red-500">
-              {errors[field as keyof PersonalInfo]}
-            </p>
-          )}
-        </div>
-      ))}
-
-      <div>
-        <textarea
-          placeholder="Resumo Profissional"
-          value={info.summary}
-          onChange={(e) => handleChange("summary", e.target.value)}
-          className={`w-full rounded-md border p-2 h-32 resize-none ${
-            errors.summary ? "border-red-500" : "border-gray-300"
-          }`}
-        />
-        <div className="flex justify-between text-sm">
-          <span>
+          <div className="flex justify-between text-xs text-gray-500">
             {errors.summary && <p className="text-red-500">{errors.summary}</p>}
-          </span>
-          <span>
-            {info.summary.length}/{MAX_SUMMARY_LENGTH}
-          </span>
+            <span>
+              {info.summary.length}/{MAX_SUMMARY_LENGTH}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={handleExport}
-          className="rounded-md bg-blue-600 px-3 py-1 text-white"
-        >
-          Exportar JSON
-        </button>
-        <label className="cursor-pointer rounded-md bg-gray-600 px-3 py-1 text-white">
-          Importar JSON
-          <input
-            type="file"
-            accept="application/json"
-            onChange={handleImport}
-            hidden
-          />
-        </label>
+
+        {/* Botões */}
+        <div className="flex gap-3 pt-2">
+          <button
+            type="button"
+            onClick={handleExport}
+            className="flex-1 rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300 transition cursor-pointer"
+          >
+            Exportar JSON
+          </button>
+          <label className="flex-1 cursor-pointer rounded-md bg-blue-600 px-4 py-2 text-white text-center hover:bg-blue-500 transition">
+            Importar JSON
+            <input
+              type="file"
+              accept="application/json"
+              onChange={handleImport}
+              hidden
+            />
+          </label>
+        </div>
       </div>
     </div>
   );

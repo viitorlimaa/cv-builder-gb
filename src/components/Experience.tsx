@@ -32,4 +32,5 @@ const Experience = () => {
         !newForm.trabalhoAtual &&
         newForm.periodoInicio > newForm.periodoFim
       ) {
-        setDateError("A data de início não pode ser maior que a data
+        setDateError("A data de início não pode ser maior que a data de fim.");
+      }

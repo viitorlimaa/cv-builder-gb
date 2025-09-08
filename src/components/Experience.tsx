@@ -1,42 +1,74 @@
-
 // src/components/Experience.tsx
 import React, { useState } from "react";
+import { useExperience } from "../context/ExperienceContext";
 
 const Experience = () => {
+  const { addExperience } = useExperience();
+
   const [form, setForm] = useState({
     empresa: "",
     cargo: "",
     periodoInicio: "",
     periodoFim: "",
     descricao: "",
-    trabalhoAtual: false
-      });
-    
-      const [dateError, setDateError] = useState("");
+    trabalhoAtual: false,
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value,type,checked } = e.target;
+  const [dateError, setDateError] = useState("");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type, checked } = e.target;
     const newForm = {
-        ...form,
-        [name]: type === "checkbox" ? checked : value,
+      ...form,
+      [name]: type === "checkbox" ? checked : value,
     };
-    if(
-        name == "periodoInicio" || 
-        (name == "periodoFim" && !newForm.trabalhoAtual)
 
-    ){
+    if (
+      name === "periodoInicio" ||
+      (name === "periodoFim" && !newForm.trabalhoAtual)
+    ) {
       if (
         newForm.periodoInicio &&
         newForm.periodoFim &&
         !newForm.trabalhoAtual &&
         newForm.periodoInicio > newForm.periodoFim
-      ){
+      ) {
         setDateError("A data de início não pode ser maior que a data de fim.");
-      }else{
+      } else {
         setDateError("");
       }
     }
+
     setForm(newForm);
+  };
+
+  // ✅ Função para salvar experiência no Context
+  const handleSave = () => {
+    if (!form.empresa || !form.cargo) {
+      alert("Preencha pelo menos Empresa e Cargo.");
+      return;
+    }
+
+    if (dateError) {
+      alert("Corrija os erros de data antes de salvar.");
+      return;
+    }
+
+    addExperience(form);
+
+    // limpa o formulário após salvar
+    setForm({
+      empresa: "",
+      cargo: "",
+      periodoInicio: "",
+      periodoFim: "",
+      descricao: "",
+      trabalhoAtual: false,
+    });
+
+    alert("Experiência salva com sucesso!");
   };
 
   return (
@@ -68,19 +100,19 @@ const Experience = () => {
         onChange={handleChange}
         className="border p-2 w-full rounded"
       />
-        {/*checkbox atvB */} 
-        <div className="flex items-center space-x-2">
-      <input
-        type="checkbox"
-        name="trabalhoAtual"
-        checked={form.trabalhoAtual}
-        onChange={handleChange}
+
+      {/* Checkbox trabalho atual */}
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          name="trabalhoAtual"
+          checked={form.trabalhoAtual}
+          onChange={handleChange}
         />
         <label htmlFor="trabalhoAtual">Trabalho Atual</label>
       </div>
-        
-      {/* desabilita o do campo periodoFim se trabalhoAtual estiver marcado */}
-      
+
+      {/* Campo periodoFim desabilitado se trabalhoAtual estiver marcado */}
       <input
         type="date"
         name="periodoFim"
@@ -88,19 +120,30 @@ const Experience = () => {
         onChange={handleChange}
         className="border p-2 w-full rounded"
         disabled={form.trabalhoAtual}
-        />
+      />
 
-        <textarea
+      <textarea
         name="descricao"
         placeholder="Descrição"
         value={form.descricao}
         onChange={handleChange}
         className="border p-2 w-full rounded"
       />
+
+      {/* Exibe erro de data se houver */}
+      {dateError && <p className="text-red-500 text-sm">{dateError}</p>}
+
+      {/* ✅ Botão salvar */}
+      <button
+        onClick={handleSave}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Salvar Experiência
+      </button>
     </div>
   );
 };
 
 export default Experience;
-
-
+// src/hooks/useCVData.ts
+import React, { createContext, useContext, useState } from "react";

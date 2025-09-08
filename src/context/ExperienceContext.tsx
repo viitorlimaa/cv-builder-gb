@@ -1,11 +1,7 @@
-
-interface ExperienceContextType {
-  experiences: Experience[];
-  addExperience: (exp: Experience) => void;
-}
 import React, { createContext, useContext, useState } from "react";
 
 export interface Experience {
+  id: string;
   empresa: string;
   cargo: string;
   periodoInicio: string;
@@ -16,7 +12,7 @@ export interface Experience {
 
 interface ExperienceContextType {
   experiences: Experience[];
-  addExperience: (exp: Experience) => void;
+  addExperience: (exp: Omit<Experience, "id">) => void;
   undo: () => void;
   redo: () => void;
   canUndo: boolean;
@@ -30,22 +26,22 @@ const ExperienceContext = createContext<ExperienceContextType | undefined>(
 export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // Histórico de estados
   const [past, setPast] = useState<Experience[][]>([]);
   const [present, setPresent] = useState<Experience[]>([]);
   const [future, setFuture] = useState<Experience[][]>([]);
 
-  const addExperience = (exp: Experience) => {
-    setPast([...past, present]); // adiciona o estado atual ao histórico passado
-    setPresent([...present, exp]); // atualiza o estado atual
-    setFuture([]); // limpa o futuro (não podemos refazer depois de uma nova ação)
+  const addExperience = (exp: Omit<Experience, "id">) => {
+    const newExp: Experience = { ...exp, id: Date.now().toString() };
+
+    setPast([...past, present]);
+    setPresent([...present, newExp]);
+    setFuture([]);
   };
 
   const undo = () => {
     if (past.length === 0) return;
     const previous = past[past.length - 1];
-    const newPast = past.slice(0, past.length - 1);
-    setPast(newPast);
+    setPast(past.slice(0, past.length - 1));
     setFuture([present, ...future]);
     setPresent(previous);
   };
@@ -53,10 +49,9 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({
   const redo = () => {
     if (future.length === 0) return;
     const next = future[0];
-    const newFuture = future.slice(1);
+    setFuture(future.slice(1));
     setPast([...past, present]);
     setPresent(next);
-    setFuture(newFuture);
   };
 
   return (
@@ -75,9 +70,10 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// Hook para usar o contexto
 export const useExperience = () => {
   const context = useContext(ExperienceContext);
-  if (!context) throw new Error("useExperience deve ser usado dentro do Provider");
+  if (!context) {
+    throw new Error("useExperience deve ser usado dentro de um ExperienceProvider");
+  }
   return context;
 };

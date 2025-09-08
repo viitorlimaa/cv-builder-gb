@@ -5,3 +5,9 @@ export type PersonalInfo = {
   linkedin: string;
   summary: string;
 };
+
+export type Skill = {
+  id: string;
+  name: string;
+  level: "Básico" | "Intermediário" | "Avançado";
+};

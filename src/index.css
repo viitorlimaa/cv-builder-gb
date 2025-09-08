@@ -1,1 +1,30 @@
 @import "tailwindcss";
+
+/* Tema Claro */
+.theme-light {
+  --bg: #ffffff;
+  --text: #111827;
+  --card-bg: #f9fafb;
+  --primary: #2563eb;
+}
+
+/* Tema Escuro */
+.theme-dark {
+  --bg: #111827;
+  --text: #f9fafb;
+  --card-bg: #1f2937;
+  --primary: #3b82f6;
+}
+
+/* Tema Corporativo */
+.theme-corporate {
+  --bg: #f4f6f8;
+  --text: #1e293b;
+  --card-bg: #ffffff;
+  --primary: #0f766e;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}

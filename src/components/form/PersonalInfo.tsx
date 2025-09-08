@@ -8,6 +8,7 @@ import {
   validateSummary,
 } from "../../utils/validation";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useTheme } from "../../theme/useTheme"; // 🔹 usamos o tema
 
 const MAX_SUMMARY_LENGTH = 500;
 
@@ -24,8 +25,9 @@ export function PersonalInfo() {
     Partial<Record<keyof PersonalInfo, string>>
   >({});
 
+  const { theme } = useTheme(); // 🔹 pega tema atual
+
   const handleChange = (field: keyof PersonalInfo, value: string) => {
-    // Bloqueia valores inválidos durante a digitação
     switch (field) {
       case "phone":
         if (!/^[0-9]*$/.test(value)) return;
@@ -35,14 +37,11 @@ export function PersonalInfo() {
           // deixa digitar, mas validará
         }
         break;
-      default:
-        break;
     }
 
     const newInfo = { ...info, [field]: value };
     setInfo(newInfo);
 
-    // Validação em tempo real
     let error = "";
     switch (field) {
       case "name":
@@ -87,7 +86,6 @@ export function PersonalInfo() {
     reader.onload = (e) => {
       try {
         const imported = JSON.parse(e.target?.result as string);
-        // Filtra apenas campos válidos
         const filtered: PersonalInfo = {
           name: imported.name || "",
           email: imported.email || "",
@@ -104,15 +102,19 @@ export function PersonalInfo() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      {/* Título da página */}
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 transition">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">
         Cadastro Pessoal
       </h1>
 
-      {/* Card */}
-      <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 space-y-6">
-        {/* Inputs Nome, Email, Telefone, LinkedIn */}
+      {/* Card — mantém padrão branco no light, muda no dark/corporate */}
+      <div
+        className={`w-full max-w-md rounded-xl shadow-2xl p-8 space-y-6 transition
+          ${theme === "light" ? "bg-white" : ""}
+          ${theme === "dark" ? "bg-gray-800 text-gray-100" : ""}
+          ${theme === "corporate" ? "bg-blue-50 border border-blue-200" : ""}`}
+      >
+        {/* Inputs */}
         {["name", "email", "phone", "linkedin"].map((field) => (
           <div key={field} className="space-y-1">
             <input
@@ -122,30 +124,38 @@ export function PersonalInfo() {
               onChange={(e) =>
                 handleChange(field as keyof PersonalInfo, e.target.value)
               }
-              className={`w-full rounded-md border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors[field as keyof PersonalInfo] ? "border-red-500" : ""
-              }`}
+              className={`w-full rounded-md border px-3 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition
+                ${theme === "light" ? "border-gray-300 text-gray-800" : ""}
+                ${theme === "dark" ? "border-gray-600 bg-gray-700 text-gray-100" : ""}
+                ${errors[field as keyof PersonalInfo] ? "border-red-500" : ""}`}
             />
             {errors[field as keyof PersonalInfo] && (
-              <p className="text-sm text-red-500">{errors[field as keyof PersonalInfo]}</p>
+              <p className="text-sm text-red-500">
+                {errors[field as keyof PersonalInfo]}
+              </p>
             )}
           </div>
         ))}
 
-        {/* Resumo Profissional */}
+        {/* Resumo */}
         <div className="space-y-1">
           <textarea
             placeholder="Resumo Profissional"
             value={info.summary}
             onChange={(e) => handleChange("summary", e.target.value)}
             rows={4}
-            className={`w-full rounded-md border border-gray-300 px-3 py-3 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.summary ? "border-red-500" : ""
-            }`}
+            className={`w-full rounded-md border px-3 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition
+              ${theme === "light" ? "border-gray-300 text-gray-800" : ""}
+              ${theme === "dark" ? "border-gray-600 bg-gray-700 text-gray-100" : ""}
+              ${errors.summary ? "border-red-500" : ""}`}
           />
-          <div className="flex justify-between text-xs text-gray-500">
-            {errors.summary && <p className="text-red-500">{errors.summary}</p>}
-            <span>{info.summary.length}/{MAX_SUMMARY_LENGTH}</span>
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            {errors.summary && (
+              <p className="text-red-500">{errors.summary}</p>
+            )}
+            <span>
+              {info.summary.length}/{MAX_SUMMARY_LENGTH}
+            </span>
           </div>
         </div>
 

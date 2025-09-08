@@ -1,3 +1,4 @@
+
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import Skeleton from "./components/ui/Skeleton";
@@ -14,8 +15,18 @@ function App() {
         </div>
       </ErrorBoundary>
       <Toast message="Hello, world!" type="success" onClose={() => {}} /> */}
+
+import { PersonalInfo } from "./components/form/PersonalInfo";
+
+function App() {
+  return (
+    <div>
+      <PersonalInfo />
+
     </div>
   );
 }
 
+
 export default App;
+

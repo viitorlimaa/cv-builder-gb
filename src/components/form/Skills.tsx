@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useCVData } from "../../hooks/useCVdata";
-import type { Skill } from "../../types/cv.types";
 import { v4 as uuidv4 } from "uuid";
-
+import type { Skill } from "../../types/cv.types";
+import { useCVData } from "../../hooks/use-cvData";
 export function Skills() {
   const { cvData, updateSkills } = useCVData();
   const [newSkill, setNewSkill] = useState("");

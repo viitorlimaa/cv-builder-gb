@@ -1,7 +1,7 @@
-import { useCVData } from "../hooks/useCVData";
-import { PersonalHeader } from "./preview/PersonalHeader";
-import { SkillsSection } from "./preview/SkillsSection";
-import { ExperienceSection } from "./preview/ExperienceSection";
+import { useCVData } from "../../hooks/use-cvData";
+import { PersonalHeader } from "./PersonalHeader";
+import { SkillsSection } from "./SkillsSection";
+import { ExperienceSection } from "./ExperienceSection";
 
 export function CVPreview() {
   const { cvData } = useCVData();

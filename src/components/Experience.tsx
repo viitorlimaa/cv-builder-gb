@@ -54,7 +54,7 @@ const Experience = () => {
     }
 
     if (dateError) {
-      toast.error("Corrija os erros de data antes de salvar.");
+      toast.error("Corrija os errors de data antes de salvar.");
       return;
     }
 
@@ -132,7 +132,7 @@ const Experience = () => {
         className="border p-2 w-full rounded"
       />
 
-      {/* Exibe erro de data se houver */}
+      {/* Exibe error de data se houver */}
       {dateError && <p className="text-red-500 text-sm">{dateError}</p>}
 
       {/* ✅ Botões de ação */}

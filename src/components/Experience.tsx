@@ -1,9 +1,11 @@
+// src/components/Experience.tsx;
 // src/components/Experience.tsx
 import React, { useState } from "react";
 import { useExperience } from "../context/ExperienceContext";
+import toast from "react-hot-toast";
 
 const Experience = () => {
-  const { addExperience } = useExperience();
+  const { addExperience, undo, redo, canUndo, canRedo } = useExperience();
 
   const [form, setForm] = useState({
     empresa: "",
@@ -47,12 +49,12 @@ const Experience = () => {
   // ✅ Função para salvar experiência no Context
   const handleSave = () => {
     if (!form.empresa || !form.cargo) {
-      alert("Preencha pelo menos Empresa e Cargo.");
+      toast.error("Preencha pelo menos Empresa e Cargo.");
       return;
     }
 
     if (dateError) {
-      alert("Corrija os erros de data antes de salvar.");
+      toast.error("Corrija os erros de data antes de salvar.");
       return;
     }
 
@@ -68,7 +70,7 @@ const Experience = () => {
       trabalhoAtual: false,
     });
 
-    alert("Experiência salva com sucesso!");
+    toast.success("Experiência salva com sucesso!");
   };
 
   return (
@@ -133,17 +135,39 @@ const Experience = () => {
       {/* Exibe erro de data se houver */}
       {dateError && <p className="text-red-500 text-sm">{dateError}</p>}
 
-      {/* ✅ Botão salvar */}
-      <button
-        onClick={handleSave}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Salvar Experiência
-      </button>
+      {/* ✅ Botões de ação */}
+      <div className="flex space-x-2">
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Salvar Experiência
+        </button>
+
+        <button
+          onClick={() => {
+            undo();
+            toast.success("Experiência desfeita!");
+          }}
+          disabled={!canUndo}
+          className="bg-gray-300 text-black px-4 py-2 rounded disabled:opacity-50"
+        >
+          Undo
+        </button>
+
+        <button
+          onClick={() => {
+            redo();
+            toast.success("Experiência refeita!");
+          }}
+          disabled={!canRedo}
+          className="bg-gray-300 text-black px-4 py-2 rounded disabled:opacity-50"
+        >
+          Redo
+        </button>
+      </div>
     </div>
   );
 };
 
 export default Experience;
-// src/hooks/useCVData.ts
-import React, { createContext, useContext, useState } from "react";

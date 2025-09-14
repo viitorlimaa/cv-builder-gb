@@ -1,0 +1,31 @@
+# config.yml
+project:
+  name: CV Builder GB
+  version: 1.0.0
+  description: >
+    Aplicação front-end para criação de currículos personalizados,
+    com visualização em tempo real e possibilidade de customização de layout.
+authors:
+  - viitorlimaa
+  - kaylanny-1
+  - devrichele
+  - gicrisfer
+environment:
+  node_version: 18.x
+  port: 5173
+  build_dir: dist
+  public_dir: public
+dependencies:
+  - typescript
+  - vite
+  - tailwindcss
+  - postcss
+  - html
+  - css
+scripts:
+  dev: npm run dev
+  build: npm run build
+  test: npm test
+repository:
+  type: git
+  url: https://github.com/viitorlimaa/cv-builder-gb.git

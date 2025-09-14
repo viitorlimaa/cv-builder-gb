@@ -1,12 +1,15 @@
-export default function Skeleton({
-  width = "100%",
-  height = "1rem",
-  className = "",
-}) {
+import { cn } from "@/src/lib/utils";
+
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`bg-gray-300 animate-pulse rounded ${className}`}
-      style={{ width, height }}
+      className={cn("animate-pulse rounded-md bg-muted", className)}
+      {...props}
     />
   );
 }
+
+export { Skeleton };

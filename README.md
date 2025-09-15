@@ -57,9 +57,6 @@ cv-builder-gb/
 ├─ project.yml
 └─ vite.config.ts
 
-markdown
-Copiar código
-
 ---
 
 ## 🔄 Fluxo de Dados

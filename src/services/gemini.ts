@@ -23,13 +23,13 @@ export async function enhanceTextWithAI(
 
   let prompt = "";
   if (context === "personal-summary") {
-    prompt = `Melhore o seguinte resumo profissional para um currículo, tornando-o mais impactante e profissional, mantendo o significado original. O texto deve ser conciso e persuasivo. Se o texto for muito curto, expanda-o ligeiramente. Se já for bom, faça apenas pequenos ajustes para polir. Aqui está o resumo: "${textToEnhance}"`;
+    prompt = `Melhore o seguinte resumo profissional para um currículo, tornando-o mais impactante e profissional, mantendo o significado original. O texto deve ser conciso e persuasivo. Se o texto for muito curto, expanda-o ligeiramente. Se já for bom, faça apenas pequenos ajustes para polir. Responda com no máximo 500 caracteres. Aqui está o resumo: "${textToEnhance}"`;
   } else if (context === "experience-description") {
-    prompt = `Melhore a seguinte descrição de experiência profissional para um currículo, usando verbos de ação e quantificando conquistas sempre que possível. Torne-o mais profissional e impactante, mantendo a essência. Se o texto for muito curto, expanda-o ligeiramente. Se já for bom, faça apenas pequenos ajustes para polir. Aqui está a descrição: "${textToEnhance}"`;
+    prompt = `Melhore a seguinte descrição de experiência profissional para um currículo, usando verbos de ação e quantificando conquistas sempre que possível. Torne-o mais profissional e impactante, mantendo a essência. Se o texto for muito curto, expanda-o ligeiramente. Se já for bom, faça apenas pequenos ajustes para polir. Responda com no máximo 500 caracteres. Aqui está a descrição: "${textToEnhance}"`;
   } else if (context === "skill-description") {
-    prompt = `Melhore a seguinte descrição de habilidade para um currículo, tornando-a mais clara e profissional. Se o texto for muito curto, expanda-o ligeiramente. Se já for bom, faça apenas pequenos ajustes para polir. Aqui está a descrição: "${textToEnhance}"`;
+    prompt = `Melhore a seguinte descrição de habilidade para um currículo, tornando-a mais clara e profissional. Se o texto for muito curto, expanda-o ligeiramente. Se já for bom, faça apenas pequenos ajustes para polir. Responda com no máximo 500 caracteres. Aqui está a descrição: "${textToEnhance}"`;
   } else {
-    prompt = `Melhore o seguinte texto, tornando-o mais profissional e gramaticalmente correto: "${textToEnhance}"`;
+    prompt = `Melhore o seguinte texto, tornando-o mais profissional e gramaticalmente correto. Responda com no máximo 500 caracteres. Texto: "${textToEnhance}"`;
   }
 
   const requestBody = {
@@ -64,7 +64,15 @@ export async function enhanceTextWithAI(
     const data: GenerateContentResponse = await response.json();
 
     if (data.candidates && data.candidates.length > 0) {
-      return data.candidates[0].content.parts[0].text;
+      let aiResponse = data.candidates[0].content.parts[0].text;
+
+      // Garantir que a resposta tenha no máximo 500 caracteres
+      const MAX_RESPONSE_LENGTH = 500;
+      if (aiResponse.length > MAX_RESPONSE_LENGTH) {
+        aiResponse = aiResponse.slice(0, MAX_RESPONSE_LENGTH);
+      }
+
+      return aiResponse;
     } else {
       throw new Error("Resposta da API Gemini não contém candidatos de texto.");
     }

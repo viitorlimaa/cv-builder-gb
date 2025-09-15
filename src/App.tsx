@@ -143,6 +143,22 @@ const App: React.FC = () => {
     setCvData((prev) => ({ ...prev, experiences }));
   }, []);
 
+  // ✅ NOVO: Limpar CVPreview no reload da página
+  useEffect(() => {
+    localStorage.removeItem("cvBuilderData"); // remove apenas os dados do CV
+    setCvData({
+      personalInfo: {
+        name: "",
+        email: "",
+        phone: "",
+        linkedin: "",
+        summary: "",
+      },
+      skills: [],
+      experiences: [],
+    });
+  }, []);
+
   useEffect(() => {
     const saved = localStorage.getItem("cvBuilderData");
     if (saved) {
